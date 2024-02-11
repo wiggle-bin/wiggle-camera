@@ -3,7 +3,7 @@ Description=WiggleRecord service
 
 [Service]
 WorkingDirectory=%h
-ExecStart=/bin/bash /usr/bin/wiggle-record-boot.sh
+ExecStart=/bin/bash /usr/bin/wiggle-camera-record-boot.sh
 
 [Install]
 WantedBy=default.target

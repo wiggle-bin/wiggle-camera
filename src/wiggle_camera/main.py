@@ -30,7 +30,7 @@ def main():
     elif args.recording:
         camera.recording()
     elif args.service:
-        os.system(f"systemctl --user {args.service} wiggle-record.service")
+        os.system(f"systemctl --user {args.service} wiggle-camera-record.service")
         print(f"WiggleCamera recording: {args.service}")
 
 
