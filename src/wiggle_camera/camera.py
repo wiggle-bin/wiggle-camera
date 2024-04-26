@@ -9,6 +9,10 @@ HOME_FOLDER = Path.home()
 BASE_FOLDER = HOME_FOLDER / "WiggleBin"
 IMG_FOLDER = BASE_FOLDER / "pictures"
 
+def create_directory():
+    os.makedirs(IMG_FOLDER, exist_ok=True)
+
+create_directory()
 
 def picture(folder=IMG_FOLDER):
     now = datetime.now()
