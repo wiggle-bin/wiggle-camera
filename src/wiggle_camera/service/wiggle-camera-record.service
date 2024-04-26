@@ -1,9 +1,0 @@
-[Unit]
-Description=WiggleRecord service
-
-[Service]
-WorkingDirectory=%h
-ExecStart=%h/Development/wiggle-camera/.venv/bin/wiggle-camera --recording
-
-[Install]
-WantedBy=default.target

@@ -43,19 +43,19 @@ wiggle-camera-install
 You can check the status with:
 
 ```
-systemctl --user status wiggle-record.service
+systemctl --user status wiggle-camera.service
 ```
 
 To stop the service run:
 
 ```
-systemctl --user stop wiggle-record.service
+systemctl --user stop wiggle-camera.service
 ```
 
 To start the service run:
 
 ```
-systemctl --user start wiggle-record.service
+systemctl --user start wiggle-camera.service
 ```
 
 ## Installation for development
