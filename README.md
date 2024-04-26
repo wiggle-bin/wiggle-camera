@@ -2,6 +2,16 @@
 
 The [WiggleR](https://github.com/wiggle-bin/wiggle-r) recording service for taking pictures.
 
+## Prepare Raspberry PI
+
+Install picamera2 - https://github.com/raspberrypi/picamera2.
+
+Set package venv to have access to system packages
+
+```
+python3 -m venv --system-site-packages .venv
+```
+
 ## Installation
 
 ```
@@ -12,6 +22,12 @@ pip3 install wiggle-camera
 
 ```
 wiggle-camera -h
+```
+
+## Prepare Raspberry PI
+
+```
+sudo apt-get install libcap-dev
 ```
 
 ## Enable recording service

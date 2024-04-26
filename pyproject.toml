@@ -16,8 +16,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  'pillow',
-  'picamera2'
+  'pillow'
 ]
 
 [project.scripts]

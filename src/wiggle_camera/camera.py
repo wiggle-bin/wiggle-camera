@@ -6,8 +6,8 @@ import time
 from PIL import Image
 
 HOME_FOLDER = Path.home()
-BASE_FOLDER = HOME_FOLDER / "WiggleR"
-IMG_FOLDER = BASE_FOLDER / "Pictures"
+BASE_FOLDER = HOME_FOLDER / "WiggleBin"
+IMG_FOLDER = BASE_FOLDER / "pictures"
 
 
 def picture(folder=IMG_FOLDER):
