@@ -20,6 +20,7 @@ def install():
     WorkingDirectory={script_path}
     ExecStart={python_path} {script_path}/main.py --recording
     Environment="PATH={venv_path}:{os.environ['PATH']}"
+    Restart=always
 
     [Install]
     WantedBy=default.target
