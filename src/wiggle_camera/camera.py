@@ -23,6 +23,12 @@ def picture(folder=IMG_FOLDER):
 
 def picture_color(filePath):
     picam2 = Picamera2()
+    WIDTH = 1024
+    HEIGHT = 768
+    config = picam2.create_preview_configuration(
+        {"size": (WIDTH, HEIGHT)}
+    )
+    picam2.configure(config)
     picam2.start()
     time.sleep(2)
     picam2.capture_file(str(filePath))
@@ -45,7 +51,6 @@ def picture_yuv():
     )
     picam2.configure(config)
     picam2.start()
-    time.sleep(2)
     yuv = picam2.capture_array()
     grey = yuv[:HEIGHT, :WIDTH]
     picam2.close()
@@ -53,7 +58,7 @@ def picture_yuv():
 
 
 def recording():
-    seconds = 5
+    seconds = 60
     try:
         while True:
             picture()
