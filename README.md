@@ -1,6 +1,6 @@
 # WiggleCamera
 
-The [WiggleR](https://github.com/wiggle-bin/wiggle-r) recording service for taking pictures.
+The [WiggleBIn](https://github.com/wiggle-bin/wiggle-bin) recording service for taking pictures.
 
 ## Prepare Raspberry PI
 
