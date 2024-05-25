@@ -11,6 +11,7 @@ env/
 
 # Package
 *.egg-info
+dist/
 
 # macOS system files
 .DS_Store
