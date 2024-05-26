@@ -1,8 +1,10 @@
 # WiggleCamera
 
-The [WiggleBIn](https://github.com/wiggle-bin/wiggle-bin) recording service for taking pictures.
+The [WiggleBin](https://github.com/wiggle-bin/wiggle-bin) recording service for taking pictures.
 
 ## Prepare Raspberry PI
+
+### Camera
 
 Install picamera2 - https://github.com/raspberrypi/picamera2.
 
@@ -10,6 +12,21 @@ Set package venv to have access to system packages
 
 ```
 python3 -m venv --system-site-packages .venv
+```
+
+### Light
+
+In `/boot/firmware/config.txt` add the following:
+
+```
+dtparam=spi=on
+enable_uart=1
+```
+
+Reboot the Raspberry Pi via terminal
+
+```
+sudo reboot
 ```
 
 ## Installation
