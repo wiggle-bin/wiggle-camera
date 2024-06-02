@@ -43,18 +43,19 @@ def picture_gray(filePath):
 def add_to_zip(filePath):
     now = datetime.now()
 
-    add_file_to_zip("%Y-%m-%d-%H", filePath)
+    add_file_to_zip("%Y-%m-%d-%H", "hourly", filePath)
     # add to daily zip if it is the 10th minute of the hour
     if now.minute % 10 == 0:
-        add_file_to_zip("%Y-%m-%d", filePath)
+        add_file_to_zip("%Y-%m-%d", "daily", filePath)
     # add to weekly zip if it is the first minute of the hour    
     if now.minute == 1:
-        add_file_to_zip("%Y-%W", filePath)
+        add_file_to_zip("%Y-%W", "weekly", filePath)
 
-def add_file_to_zip(time, filePath):
+def add_file_to_zip(time, subFolder, filePath):
     now = datetime.now()
     zipName = now.strftime(time)
-    zipPath = ZIP_FOLDER / (zipName + ".zip")
+    zipPath = ZIP_FOLDER / subFolder / (zipName + ".zip")
+    os.makedirs(zipPath.parent, exist_ok=True)
     with zipfile.ZipFile(zipPath, "a") as zipf:
         zipf.write(filePath, arcname=now.strftime("%Y-%m-%d-%H-%M") + ".jpg")
 
