@@ -9,9 +9,9 @@ IMG_FOLDER = BASE_FOLDER / "pictures"
 VIDEO_FOLDER = BASE_FOLDER / "videos"
 ZIP_FOLDER = BASE_FOLDER / "zips"
 
-def create_timelapse(subFolder, date):
+def create_timelapse(subFolder, date, outputName):
     zip_file = ZIP_FOLDER / subFolder / f"{date}.zip"
-    video_file = VIDEO_FOLDER / "latest.mp4"
+    video_file = VIDEO_FOLDER / f"{outputName}.mp4"
 
     temp_folder = BASE_FOLDER / "temp"
     temp_folder.mkdir(parents=True, exist_ok=True)
@@ -37,9 +37,9 @@ def create_timelapse(subFolder, date):
             str(video_file),
         ]
     )
-    
+
     if temp_folder.exists():
         shutil.rmtree(temp_folder)
 
 if __name__ == "__main__":
-    create_timelapse("hourly", "2024-06-02-16")
+    create_timelapse("daily", "2024-06-02", "daily")

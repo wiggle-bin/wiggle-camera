@@ -53,9 +53,12 @@ def add_to_zip(filePath):
     # add to weekly zip if it is the first minute of the hour    
     if now.minute == 1:
         add_file_to_zip("%Y-%W", "weekly", filePath)
-    # create new timelapse if it is the last minute of the hour 
+    # create new hourly timelapse if it is the last minute of the hour 
     if now.minute == 59:
-        create_timelapse("hourly", now.strftime("%Y-%m-%d-%H"))
+        create_timelapse("hourly", now.strftime("%Y-%m-%d-%H"), "hourly")
+     # create new daily timelapse if it is the last minute of the day
+    if now.hour == 23 and now.minute == 59:
+        create_timelapse("daily", now.strftime("%Y-%m-%d"), "daily")
 
 def add_file_to_zip(time, subFolder, filePath):
     now = datetime.now()
