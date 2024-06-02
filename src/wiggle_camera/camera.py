@@ -4,10 +4,12 @@ from datetime import datetime
 from picamera2 import Picamera2
 import time
 from PIL import Image
+import zipfile
 
 HOME_FOLDER = Path.home()
 BASE_FOLDER = HOME_FOLDER / "WiggleBin"
 IMG_FOLDER = BASE_FOLDER / "pictures"
+ZIP_FOLDER = BASE_FOLDER / "zips"
 
 def create_directory():
     os.makedirs(IMG_FOLDER, exist_ok=True)
@@ -15,11 +17,8 @@ def create_directory():
 create_directory()
 
 def picture(folder=IMG_FOLDER):
-    now = datetime.now()
-    fileName = now.strftime("%Y-%m-%d-%H-%M-%S")
-    filePath = folder / f"{fileName}.jpg"
+    filePath = folder / "latest.jpg"
     picture_gray(filePath)
-
 
 def picture_color(filePath):
     picam2 = Picamera2()
@@ -39,8 +38,25 @@ def picture_gray(filePath):
     grey = picture_yuv()
     image = Image.fromarray(grey)
     image.save(filePath)
-    print(f"Saved grayscale picture to {filePath}")
+    add_to_zip(filePath)
 
+def add_to_zip(filePath):
+    now = datetime.now()
+
+    add_file_to_zip("%Y-%m-%d-%H", filePath)
+    # add to daily zip if it is the 10th minute of the hour
+    if now.minute % 10 == 0:
+        add_file_to_zip("%Y-%m-%d", filePath)
+    # add to weekly zip if it is the first minute of the hour    
+    if now.minute == 1:
+        add_file_to_zip("%Y-%W", filePath)
+
+def add_file_to_zip(time, filePath):
+    now = datetime.now()
+    zipName = now.strftime(time)
+    zipPath = ZIP_FOLDER / (zipName + ".zip")
+    with zipfile.ZipFile(zipPath, "a") as zipf:
+        zipf.write(filePath, arcname=now.strftime("%Y-%m-%d-%H-%M") + ".jpg")
 
 def picture_yuv():
     WIDTH = 1024
