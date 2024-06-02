@@ -6,10 +6,13 @@ import time
 from PIL import Image
 import zipfile
 
+from wiggle_camera.timelapse import create_timelapse, create_timelapse
+
 HOME_FOLDER = Path.home()
 BASE_FOLDER = HOME_FOLDER / "WiggleBin"
 IMG_FOLDER = BASE_FOLDER / "pictures"
 ZIP_FOLDER = BASE_FOLDER / "zips"
+VIDEO_FOLDER = BASE_FOLDER / "videos"
 
 def create_directory():
     os.makedirs(IMG_FOLDER, exist_ok=True)
@@ -50,6 +53,9 @@ def add_to_zip(filePath):
     # add to weekly zip if it is the first minute of the hour    
     if now.minute == 1:
         add_file_to_zip("%Y-%W", "weekly", filePath)
+    # create new timelapse if it is the last minute of the hour 
+    if now.minute == 59:
+        create_timelapse("hourly", now.strftime("%Y-%m-%d-%H"))
 
 def add_file_to_zip(time, subFolder, filePath):
     now = datetime.now()
