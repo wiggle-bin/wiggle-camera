@@ -5,6 +5,7 @@ from picamera2 import Picamera2
 import time
 from PIL import Image
 import zipfile
+from wiggle_camera.write import write_to_csv
 
 from wiggle_camera.timelapse import create_timelapse, create_timelapse
 
@@ -39,9 +40,21 @@ def picture_color(filePath):
 
 def picture_gray(filePath):
     grey = picture_yuv()
+    mean_gray_value = grey.mean()
     image = Image.fromarray(grey)
     image.save(filePath)
     add_to_zip(filePath)
+    store_mean_gray_value(mean_gray_value)
+
+def store_mean_gray_value(mean_gray_value):
+    now = datetime.now()
+
+    if now.minute % 10 == 0:
+        sensor_data = {
+            "time": now.isoformat(),
+            "mean_gray": mean_gray_value
+        }
+        mean_gray_value = write_to_csv(sensor_data, 'image-data', ["time", "mean_gray"])
 
 def add_to_zip(filePath):
     now = datetime.now()
