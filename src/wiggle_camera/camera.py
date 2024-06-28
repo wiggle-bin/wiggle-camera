@@ -6,8 +6,10 @@ import time
 from PIL import Image
 import zipfile
 from wiggle_camera.write import write_to_csv
+import numpy as np
 
 from wiggle_camera.timelapse import create_timelapse, create_timelapse
+from wiggle_camera.vision import get_contour_info_and_contours
 
 HOME_FOLDER = Path.home()
 BASE_FOLDER = HOME_FOLDER / "WiggleBin"
@@ -21,8 +23,9 @@ def create_directory():
 create_directory()
 
 def picture(folder=IMG_FOLDER):
+    previousImage = Image.open(folder / "latest.jpg").convert('L')
     filePath = folder / "latest.jpg"
-    picture_gray(filePath)
+    picture_gray(filePath, previousImage)
 
 def picture_color(filePath):
     picam2 = Picamera2()
@@ -38,23 +41,41 @@ def picture_color(filePath):
     picam2.close()
 
 
-def picture_gray(filePath):
+def picture_gray(filePath, previousImage):
     grey = picture_yuv()
     mean_gray_value = grey.mean()
     image = Image.fromarray(grey)
     image.save(filePath)
     add_to_zip(filePath)
-    store_mean_gray_value(mean_gray_value)
+    store_vision_data(mean_gray_value, filePath, previousImage)
 
-def store_mean_gray_value(mean_gray_value):
+def store_vision_data(mean_gray_value, filePath, previousImage):
     now = datetime.now()
+    
+    sensor_data = {
+        "time": now.isoformat(),
+        "mean_gray": mean_gray_value
+    }
 
-    if now.minute % 10 == 0:
-        sensor_data = {
-            "time": now.isoformat(),
-            "mean_gray": mean_gray_value
-        }
-        mean_gray_value = write_to_csv(sensor_data, 'image-data', ["time", "mean_gray"])
+    if (previousImage):
+        image = Image.open(filePath).convert('L')
+        contour_data = get_contour_info_and_contours(np.array(image), np.array(previousImage))
+        sensor_data.update(contour_data)
+    
+    write_to_csv(sensor_data, 'image-data', [
+        "time", 
+        "mean_gray",
+        "lighter_count_pixels",
+        "lighter_small_count",
+        "lighter_small_total_area",
+        "lighter_large_count",
+        "lighter_large_total_area",
+        "darker_count_pixels",
+        "darker_small_count",
+        "darker_small_total_area",
+        "darker_large_count",
+        "darker_large_total_area"
+    ])
 
 def add_to_zip(filePath):
     now = datetime.now()
