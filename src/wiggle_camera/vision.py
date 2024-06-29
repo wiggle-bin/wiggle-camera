@@ -1,5 +1,7 @@
 from skimage import measure
 import numpy as np
+from PIL import Image, ImageDraw
+import numpy as np
 
 def calculate_diff_and_find_contours(image, compared_to_image, threshold):
     # Calculate the difference
@@ -33,7 +35,7 @@ def get_contours_by_size(contours, image, small_contour_threshold):
     
     return small_contour_list, large_contour_list
 
-def get_contour_info_and_contours(image, compared_to_image, threshold=10, small_contour_threshold=40):
+def get_contour_info_and_contours(image, compared_to_image, output_file, threshold=10, small_contour_threshold=40):
     # Calculate difference and find contours
     contours_lighter, contours_darker, lighter_pixels, darker_pixels = calculate_diff_and_find_contours(image, compared_to_image, threshold)
 
@@ -46,6 +48,9 @@ def get_contour_info_and_contours(image, compared_to_image, threshold=10, small_
     total_area_lighter_large = sum([np.sum(contour) for contour in large_contours_lighter])
     total_area_darker_small = sum([np.sum(contour) for contour in small_contours_darker])
     total_area_darker_large = sum([np.sum(contour) for contour in large_contours_darker])
+
+    # Save the contours image
+    save_contours_image(image, small_contours_lighter, large_contours_lighter, small_contours_darker, large_contours_darker, output_file)
 
     # Create a dictionary to store the results
     return {
@@ -60,3 +65,28 @@ def get_contour_info_and_contours(image, compared_to_image, threshold=10, small_
         'darker_large_count': len(large_contours_darker),
         'darker_large_total_area': total_area_darker_large
     }
+
+def save_contours_image(image, small_contours_lighter, large_contours_lighter, small_contours_darker, large_contours_darker, output_filename):
+    # Convert the grayscale image to RGB
+    image_rgb = Image.fromarray(np.uint8(image)).convert('RGB')
+
+    # Create a draw object
+    draw = ImageDraw.Draw(image_rgb)
+
+    # Function to draw contours
+    def draw_contours(contours, color):
+        for contour in contours:
+            if isinstance(contour[0], (list, np.ndarray)) and len(contour[0]) == 2:
+                contour = [(x[0], x[1]) for x in contour]  # Convert contour points to tuples
+                draw.polygon(contour, outline=color)
+            else:
+                print(f"Unexpected format for contour: {contour}")
+
+    # Draw the contours in different colors
+    draw_contours(small_contours_lighter, 'blue')
+    draw_contours(large_contours_lighter, 'green')
+    draw_contours(small_contours_darker, 'orange')
+    draw_contours(large_contours_darker, 'red')
+
+    # Save the image
+    image_rgb.save(output_filename)

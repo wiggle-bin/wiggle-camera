@@ -59,7 +59,7 @@ def store_vision_data(mean_gray_value, filePath, previousImage):
 
     if (previousImage):
         image = Image.open(filePath).convert('L')
-        contour_data = get_contour_info_and_contours(np.array(image), np.array(previousImage))
+        contour_data = get_contour_info_and_contours(np.array(image), np.array(previousImage), IMG_FOLDER / 'contours.jpg')
         sensor_data.update(contour_data)
     
     write_to_csv(sensor_data, 'image-data', [
