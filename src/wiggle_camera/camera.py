@@ -7,6 +7,7 @@ from PIL import Image
 import zipfile
 from wiggle_camera.write import write_to_csv
 import numpy as np
+from PIL import Image, ImageEnhance, ImageFilter
 
 from wiggle_camera.timelapse import create_timelapse, create_timelapse
 from wiggle_camera.vision import get_contour_info_and_contours
@@ -40,11 +41,32 @@ def picture_color(filePath):
     picam2.capture_file(str(filePath))
     picam2.close()
 
+def enhance_image(image, contrast_factor=2.0, brightness_factor=1.5, sharpness_factor=2.0):    
+    # Adjust contrast
+    contrast_enhancer = ImageEnhance.Contrast(image)
+    image = contrast_enhancer.enhance(contrast_factor)
+    
+    # Adjust brightness
+    brightness_enhancer = ImageEnhance.Brightness(image)
+    image = brightness_enhancer.enhance(brightness_factor)
+    
+    # Adjust sharpness
+    sharpness_enhancer = ImageEnhance.Sharpness(image)
+    image = sharpness_enhancer.enhance(sharpness_factor)
+    
+    # Convert to grayscale
+    image = image.convert("L")
+    
+    # Apply a sharpen filter
+    image = image.filter(ImageFilter.SHARPEN)
+    
+    return image
 
 def picture_gray(filePath, previousImage):
     grey = picture_yuv()
     mean_gray_value = grey.mean()
     image = Image.fromarray(grey)
+    image = enhance_image(image)
     image.save(filePath)
     add_to_zip(filePath)
     store_vision_data(mean_gray_value, filePath, previousImage)
