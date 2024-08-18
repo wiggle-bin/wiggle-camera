@@ -11,7 +11,7 @@ pixels = neopixel.NeoPixel_SPI(spi,
                                pixel_order=PIXEL_ORDER,
                                auto_write=False)
 
-default_brightness = 0.2
+default_brightness = 0.05
 
 def on(brightness=default_brightness):
     pixels.brightness = brightness

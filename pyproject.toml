@@ -18,6 +18,7 @@ classifiers = [
 dependencies = [
   'pillow',
   'adafruit-circuitpython-neopixel-spi',
+  'pandas'
 ]
 
 [project.scripts]

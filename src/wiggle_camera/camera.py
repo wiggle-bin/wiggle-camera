@@ -5,12 +5,13 @@ from picamera2 import Picamera2
 import time
 from PIL import Image
 import zipfile
-from wiggle_camera.write import write_to_csv
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
 
+from wiggle_camera.write import write_to_csv, write_rows_to_csv, remove_columns_from_csv
 from wiggle_camera.timelapse import create_timelapse, create_timelapse
-from wiggle_camera.vision import get_contour_info_and_contours
+from wiggle_camera.vision import calculate_diff
+from wiggle_camera.object_detection import perform_inference
 
 HOME_FOLDER = Path.home()
 BASE_FOLDER = HOME_FOLDER / "WiggleBin"
@@ -68,12 +69,38 @@ def picture_gray(filePath, previousImage):
     image = Image.fromarray(grey)
     image = enhance_image(image)
     image.save(filePath)
-    add_to_zip(filePath)
-    store_vision_data(mean_gray_value, filePath, previousImage)
+    (zipName, fileName) = add_to_zip(filePath)
+    store_vision_data(mean_gray_value, filePath, previousImage, zipName, fileName)
 
-def store_vision_data(mean_gray_value, filePath, previousImage):
+def store_vision_data(mean_gray_value, filePath, previousImage, zipName, fileName):
     now = datetime.now()
-    
+
+    # Predictions
+    inference_data = perform_inference(filePath)
+    predictions = inference_data.get('predictions', [])
+
+    for item in predictions:
+        item.update({
+            "time": now.isoformat(),
+            "filename": fileName,
+            "zip": zipName
+        })
+        item.pop("image_path", None)
+        item.pop("prediction_type", None)
+
+    write_rows_to_csv(predictions, 'image-predictions', [
+        "time",
+        "filename",
+        "x",
+        "y",
+        "width",
+        "height",
+        "class",
+        "confidence",
+        "zip"
+    ])
+
+    # Image data
     sensor_data = {
         "time": now.isoformat(),
         "mean_gray": mean_gray_value
@@ -81,34 +108,28 @@ def store_vision_data(mean_gray_value, filePath, previousImage):
 
     if (previousImage):
         image = Image.open(filePath).convert('L')
-        contour_data = get_contour_info_and_contours(np.array(image), np.array(previousImage), IMG_FOLDER / 'contours.jpg')
-        sensor_data.update(contour_data)
-    
+        image_comparison_data = calculate_diff(np.array(image), np.array(previousImage))
+        sensor_data.update(image_comparison_data)
+
     write_to_csv(sensor_data, 'image-data', [
         "time", 
         "mean_gray",
         "lighter_count_pixels",
-        "lighter_small_count",
-        "lighter_small_total_area",
-        "lighter_large_count",
-        "lighter_large_total_area",
-        "darker_count_pixels",
-        "darker_small_count",
-        "darker_small_total_area",
-        "darker_large_count",
-        "darker_large_total_area"
+        "darker_count_pixels"
     ])
 
 def add_to_zip(filePath):
     now = datetime.now()
+    fileName = now.strftime("%Y-%m-%d-%H-%M") + ".jpg"
 
-    add_file_to_zip("%Y-%m-%d-%H", "hourly", filePath)
+    zipName = add_file_to_zip("%Y-%m-%d-%H", "hourly", filePath, fileName)
+
     # add to daily zip if it is the 10th minute of the hour
     if now.minute % 10 == 0:
-        add_file_to_zip("%Y-%m-%d", "daily", filePath)
+        add_file_to_zip("%Y-%m-%d", "daily", filePath, fileName)
     # add to weekly zip if it is the first minute of the hour    
     if now.minute == 1:
-        add_file_to_zip("%Y-%W", "weekly", filePath)
+        add_file_to_zip("%Y-%W", "weekly", filePath, fileName)
     # create new hourly timelapse if it is the last minute of the hour 
     if now.minute == 59:
         create_timelapse("hourly", now.strftime("%Y-%m-%d-%H"), "hourly")
@@ -116,13 +137,16 @@ def add_to_zip(filePath):
     if now.hour == 23 and now.minute == 59:
         create_timelapse("daily", now.strftime("%Y-%m-%d"), "daily")
 
-def add_file_to_zip(time, subFolder, filePath):
+    return (zipName, fileName)
+
+def add_file_to_zip(time, subFolder, filePath, fileName):
     now = datetime.now()
     zipName = now.strftime(time)
     zipPath = ZIP_FOLDER / subFolder / (zipName + ".zip")
     os.makedirs(zipPath.parent, exist_ok=True)
     with zipfile.ZipFile(zipPath, "a") as zipf:
-        zipf.write(filePath, arcname=now.strftime("%Y-%m-%d-%H-%M") + ".jpg")
+        zipf.write(filePath, arcname=fileName)
+    return zipName
 
 def picture_yuv():
     WIDTH = 1024
