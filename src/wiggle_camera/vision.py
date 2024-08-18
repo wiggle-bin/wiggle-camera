@@ -8,6 +8,6 @@ def calculate_diff(image, compared_to_image, threshold=10):
     darker_pixels = np.sum(diff < -threshold)
 
     return {
-        'lighter_count_pixels': lighter_pixels,
-        'darker_count_pixels': darker_pixels,
+        'count_pixels_lighter': lighter_pixels,
+        'count_pixels_darker': darker_pixels,
     }

@@ -104,13 +104,13 @@ def store_vision_data(mean_gray_value, filePath, previousImage, zipName, fileNam
     sensor_data = {
         "time": now.isoformat(),
         "mean_gray": mean_gray_value,
-        "detection_min_confidence": min([item['confidence'] for item in predictions], default=0),
-        "detection_max_confidence": max([item['confidence'] for item in predictions], default=0),
-        "detection_avg_confidence": np.mean([item['confidence'] for item in predictions]),
+        "detection_confidence_min": min([item['confidence'] for item in predictions], default=0),
+        "detection_confidence_max": max([item['confidence'] for item in predictions], default=0),
+        "detection_confidence_avg": np.mean([item['confidence'] for item in predictions]),
         "detection_count": len(predictions),
-        "detection_worm_count": len([item for item in predictions if item['class'] == 'worm']),
-        "detection_fly_count": len([item for item in predictions if item['class'] == 'fly']),
-        "detection_fly_larva_count": len([item for item in predictions if item['class'] == 'fly-larva'])
+        "detection_class_worm_count": len([item for item in predictions if item['class'] == 'worm']),
+        "detection_class_fly_count": len([item for item in predictions if item['class'] == 'fly']),
+        "detection_class_fly_larva_count": len([item for item in predictions if item['class'] == 'fly-larva'])
     }
 
     if (previousImage):
@@ -121,15 +121,15 @@ def store_vision_data(mean_gray_value, filePath, previousImage, zipName, fileNam
     write_to_csv(sensor_data, 'image-data', [
         "time", 
         "mean_gray",
-        "lighter_count_pixels",
-        "darker_count_pixels",
-        "detection_min_confidence",
-        "detection_max_confidence",
-        "detection_avg_confidence",
+        "count_pixels_lighter",
+        "count_pixels_darker",
+        "detection_confidence_min",
+        "detection_confidence_max",
+        "detection_confidence_avg",
         "detection_count",
-        "detection_worm_count",
-        "detection_fly_count",
-        "detection_fly_larva_count",
+        "detection_class_worm_count",
+        "detection_class_fly_count",
+        "detection_class_fly_larva_count",
     ])
 
 def add_to_zip(filePath):
