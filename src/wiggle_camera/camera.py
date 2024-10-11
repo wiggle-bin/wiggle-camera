@@ -106,7 +106,7 @@ def store_vision_data(mean_gray_value, filePath, previousImage, zipName, fileNam
         "mean_gray": mean_gray_value,
         "detection_confidence_min": min([item['confidence'] for item in predictions], default=0),
         "detection_confidence_max": max([item['confidence'] for item in predictions], default=0),
-        "detection_confidence_avg": np.mean([item['confidence'] for item in predictions]),
+        "detection_confidence_avg": np.mean([item['confidence'] for item in predictions]) if predictions else 0,
         "detection_count": len(predictions),
         "detection_class_worm_count": len([item for item in predictions if item['class'] == 'worm']),
         "detection_class_fly_count": len([item for item in predictions if item['class'] == 'fly']),
@@ -146,10 +146,13 @@ def add_to_zip(filePath):
         add_file_to_zip("%Y-%W", "weekly", filePath, fileName)
     # create new hourly timelapse if it is the last minute of the hour 
     if now.minute == 59:
-        create_timelapse("hourly", now.strftime("%Y-%m-%d-%H"), "hourly")
+        create_timelapse("hourly", now.strftime("%Y-%m-%d-%H"))
      # create new daily timelapse if it is the last minute of the day
     if now.hour == 23 and now.minute == 59:
-        create_timelapse("daily", now.strftime("%Y-%m-%d"), "daily")
+        create_timelapse("daily", now.strftime("%Y-%m-%d"))
+    # create new weekly timelapse if it is the last minute of the week
+    if now.weekday() == 6 and now.hour == 23 and now.minute == 59:
+        create_timelapse("weekly", now.strftime("%Y-%W"))
 
     return (zipName, fileName)
 

@@ -53,7 +53,6 @@ def perform_inference(image_file = LATEST_IMAGE, confidence=CONFIDENCE, overlap=
     # Save and plot the prediction
     result_path = os.path.join(IMG_FOLDER, "detection.jpg")
     prediction.save(result_path)
-    prediction.plot()
     
     # Return the prediction results
     return prediction.json()
