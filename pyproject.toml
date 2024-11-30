@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wiggle_camera"
-version = "0.0.2"
+version = "0.0.4"
 authors = [
   { name="Studio Rabota" },
 ]
@@ -18,7 +18,8 @@ classifiers = [
 dependencies = [
   'pillow',
   'adafruit-circuitpython-neopixel-spi',
-  'pandas'
+  'pandas',
+  'roboflow'
 ]
 
 [project.scripts]

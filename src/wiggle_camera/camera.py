@@ -25,7 +25,10 @@ def create_directory():
 create_directory()
 
 def picture(folder=IMG_FOLDER):
-    previousImage = Image.open(folder / "latest.jpg").convert('L')
+    try:
+        previousImage = Image.open(folder / "latest.jpg").convert('L')
+    except FileNotFoundError:
+        previousImage = None
     filePath = folder / "latest.jpg"
     picture_gray(filePath, previousImage)
 
@@ -87,6 +90,8 @@ def store_vision_data(mean_gray_value, filePath, previousImage, zipName, fileNam
         })
         item.pop("image_path", None)
         item.pop("prediction_type", None)
+
+    print(predictions)
 
     write_rows_to_csv(predictions, 'image-predictions', [
         "time",
